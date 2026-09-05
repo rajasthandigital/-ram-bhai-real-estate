@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#082d59" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="apple-mobile-web-app-title" content="Ram Bhai Real Estate" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Ram Bhai Real Estate Agent</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toast" class="toast"></div>
+  <button id="installApp" class="install-app" aria-label="Install app">📲 Install App</button>
+  <div id="installHelp" class="install-help" hidden>
+    <div class="install-card">
+      <button class="install-close" onclick="closeInstallHelp()">×</button>
+      <h3>📲 Install Ram Bhai App</h3>
+      <p><b>Android:</b> Chrome me <b>Install App</b> ya <b>Add to Home screen</b> select karein.</p>
+      <p><b>iPhone:</b> Safari me <b>Share</b> → <b>Add to Home Screen</b> → <b>Add</b>.</p>
+      <button class="btn btn-primary btn-full" onclick="closeInstallHelp()">Done</button>
+    </div>
+  </div>
+  <script src="app.js"></script>
+  <script>
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installApp');
+    const help = document.getElementById('installHelp');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      installBtn.classList.add('show');
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        installBtn.classList.remove('show');
+      } else {
+        help.hidden = false;
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.classList.remove('show');
+      if (typeof showToast === 'function') showToast('App installed successfully');
+    });
+
+    function closeInstallHelp(){ help.hidden = true; }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+    }
+  </script>
+</body>
+</html>
